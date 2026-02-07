@@ -12,7 +12,7 @@ dotenv.config();
 app.use(express.json());
 app.use(
   express.urlencoded({
-    extended: false,
+    extended: true,
   }),
 );
 app.use(
@@ -20,14 +20,36 @@ app.use(
   express.static(path.join(process.cwd(), "src/Features/CV/Router/uploads")),
 );
 
+
+
 app.use(
   cors({
     origin: "*",
   }),
 );
 
+
+
 app.use("/api/v1/auth", AuthRouter);
 app.use("/api/v1/cv", CVRouter);
+
+
+app.use(
+  (
+    err: any,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction,
+  ) => {
+    const statusCode = err.statusCode || 500;
+
+    res.status(statusCode).json({
+      success: false,
+      message: err.message || "Internal Server Error",
+    });
+    next()
+  },
+);
 
 app.listen(Port, () => {
   console.log(

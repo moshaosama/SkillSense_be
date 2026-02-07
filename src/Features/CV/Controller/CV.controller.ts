@@ -8,7 +8,10 @@ export class CVController {
       const { user_id } = req.body;
       const file = req.file;
 
-      if (!file) return res.status(400).json({ error: "File is required" });
+      if (!file) return res.status(400).json({
+        success: false,
+        message: "File is required",
+      });
 
       const result = await CVRepository.UploadFile(user_id, file);
       res.json(result);
