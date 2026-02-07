@@ -3,6 +3,7 @@ import db from "../../../utils/DB.ts";
 import type { User } from "../../../Types/Auth/type.ts";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { AppError } from "../../../utils/AppError.ts";
 
 dotenv.config();
 
@@ -31,13 +32,13 @@ class AuthRepository {
     const [rows] = await db.query<User[]>(GetUser, valueGetUser);
 
     if (!rows) {
-      throw Error("you don't have account on this email");
+      throw new AppError("you don't have account on this email", 401);
     }
 
     const isValid = await bcrypt.compare(password, rows[0]?.password as string);
 
     if (!isValid) {
-      throw Error("Password is not correct");
+      throw new AppError("Password is not correct", 401);
     }
 
     const token = await jwt.sign({ email: email }, process.env.SECRET_KEY!);
